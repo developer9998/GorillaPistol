@@ -61,7 +61,7 @@ namespace GorillaPistol
 
         void OnGameInitialized(object sender, EventArgs e)
         {
-            GameObject RightPalm = GameObject.Find("OfflineVRRig/Actual Gorilla/rig/body/shoulder.R/upper_arm.R/forearm.R/hand.R/palm.01.R");
+            GameObject RightPalm = GorillaTagger.Instance.offlineVRRig.rightHandTransform.parent.Find("palm.01.R").gameObject;
             Stream AssetBundleStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("GorillaPistol.Resources.pistol");
             AssetBundle AssetBundle = AssetBundle.LoadFromStream(AssetBundleStream);
             GameObject Object = AssetBundle.LoadAsset<GameObject>("pistol");
@@ -124,7 +124,7 @@ namespace GorillaPistol
 
         public static void PickUpGun()
         {
-            GameObject RightPalm = GameObject.Find("OfflineVRRig/Actual Gorilla/rig/body/shoulder.R/upper_arm.R/forearm.R/hand.R/palm.01.R");
+            GameObject RightPalm = GorillaTagger.Instance.offlineVRRig.rightHandTransform.parent.Find("palm.01.R").gameObject;
             if (handCollider != null)
             {
                 GameObject.Destroy(handCollider);
@@ -210,21 +210,16 @@ namespace GorillaPistol
             yield break;
         }
 
-        void OnTriggerStay(Collider other)
+        void LateUpdate()
         {
-            if (Plugin.canPick && !Plugin.GrabbingGun && Plugin.RightGripDown)
+            float dist = Vector3.Distance(GorillaLocomotion.Player.Instance.rightHandTransform.position, transform.position);
+            if (dist < 0.25f)
             {
-                StartCoroutine(Raise());
-                Plugin.PickUpGun();
-            }
-        }
-
-        void OnTriggerEnter(Collider other)
-        {
-            if (Plugin.canPick && !Plugin.GrabbingGun && Plugin.RightGripDown)
-            {
-                StartCoroutine(Raise());
-                Plugin.PickUpGun();
+                if (Plugin.canPick && !Plugin.GrabbingGun && Plugin.RightGripDown)
+                {
+                    StartCoroutine(Raise());
+                    Plugin.PickUpGun();
+                }
             }
         }
     }
